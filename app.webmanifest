@@ -5,7 +5,7 @@
     "icons": [
         {
             "src": "img/temp-icon.jpg",
-            "sizes": "512x512",
+            //"sizes": "512x512",
             "type": "image/jpg"
         }
     ],
