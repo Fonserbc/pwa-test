@@ -1,0 +1,16 @@
+﻿{
+    "name": "Ferran's PWA test'",
+    "short_name": "Ferran test'",
+    "description": "Just a test for Progressive Web Apps",
+    "icons": [
+        {
+            "src": "img/temp-icon.jpg",
+            "sizes": "512x512",
+            "type": "image/jpg"
+        }
+    ],
+    "start_url": "/index.html",
+    "display": "fullscreen",
+    "theme_color": "white",
+    "background_color": "black"
+}
