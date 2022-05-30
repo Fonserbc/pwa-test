@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Lillium PWA test</title>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&family=Nunito&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: black;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: inline-block;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            z-index: -1;
+            image-rendering: pixelated;
+        }
+
+        #container {
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            min-height: 100%;
+            top: 0px;
+            left: 0px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #resolution {
+            color: white;
+            font-size:2rem;
+        }
+
+        #fullscreen-button {
+            position:fixed;
+            top:0px;
+            right:0px;
+            background-color: white;
+            color: black;
+            font-size: 2rem;
+            margin:8px;
+            padding:8px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas">
+    </canvas>
+
+    <div id="container">
+        <p id="resolution">800x600</p>
+    </div>
+
+    <button id="fullscreen-button" onclick="toggleFullScreen()">
+        Fullscreen
+    </button>
+
+
+    <script>
+        let canvas = document.getElementById("canvas");
+        let width = document.body.clientWidth;
+        let height = document.body.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+        let ctx = canvas.getContext("2d");
+        let resolutionDisplay = document.getElementById("resolution")
+
+        let needCheckResize = true;
+        function checkWindowResize() {
+            let w = Math.max(document.body.clientWidth, window.innerWidth);
+            let h = Math.max(document.body.clientHeight, window.innerHeight);
+            if (w != width || h != height || needCheckResize) {
+                //console.log(`window.innerWidth: ${window.innerWidth}, window.innerHeight: ${window.innerHeight}, ${width} x ${height}`);
+
+                width = w;
+                height = h;
+                canvas.width = width;
+                canvas.height = height;
+
+                resolutionDisplay.innerText = `${width} x ${height}`;
+                needCheckResize = false;
+
+                // TODO repaint
+                redraw();
+            }
+        }
+
+        function mainLoop() {
+            requestAnimationFrame(mainLoop);
+            checkWindowResize();
+        }
+
+        function redraw() {
+            console.log("redrawing..");
+
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+            ctx.strokeStyle = "#34a";
+            let startPower = 7;
+            let posFix = 0;
+            for (let i = startPower; Math.pow(2, i) < width || Math.pow(2, i) < height; ++i) {
+                let di = Math.pow(2, i);
+
+                if (di < width) {
+                    ctx.beginPath();
+                    ctx.lineWidth = (i - startPower) * 3;
+                    for (let x = 0; x < width; x += di) {
+                        ctx.moveTo(x + posFix, 0);
+                        ctx.lineTo(x + posFix, height);
+                    }
+                    ctx.stroke();
+                }
+                if (di < height) {
+                    ctx.beginPath();
+                    ctx.lineWidth = (i - startPower) * 3;
+                    for (let y = 0; y < height; y += di) {
+                        ctx.moveTo(0, y + posFix);
+                        ctx.lineTo(width, y + posFix);
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        redraw();
+        requestAnimationFrame(mainLoop);
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>
