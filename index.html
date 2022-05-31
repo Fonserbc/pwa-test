@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>Lillium PWA test</title>
 
-    <meta name="viewport" content="viewport-fit=cover, user-scalable=no"> <!--width=device-width, initial-scale=1, maximum-scale=1-->
+    <meta name="viewport" content="viewport-fit=cover, user-scalable=no, initial-scale=1, maximum-scale=1"> <!--width=device-width-->
     <!-- Startup configuration -->
     <link rel="manifest" href="app.webmanifest">
 
@@ -29,7 +29,7 @@
         }
 
         #safe-area {
-            position: fixed;
+            /*position: fixed;*/
             bottom: 0px;
             width: 100%;
             height: 100%;
@@ -50,10 +50,10 @@
         canvas {
             width: 100%;
             aspect-ratio: 1 / 1;
-            display: inline-block;
-            /*position: fixed;*/
+            /*display: inline-block;
+            position: fixed;
             top: 0px;
-            left: 0px;
+            left: 0px;*/
             z-index: -1;
             image-rendering: pixelated;
         }
@@ -110,8 +110,8 @@
         let canvas = document.getElementById("canvas");
         let safeArea = document.getElementById("safe-area");
         console.log(safeArea);
-        let width = safeArea.clientWidth;
-        let height = safeArea.clientHeight;
+        let width = safeArea.clientWidth * window.devicePixelRatio;
+        let height = safeArea.clientHeight * window.devicePixelRatio;
         canvas.width = Math.min(width, height);
         canvas.height = Math.min(width, height);
         let ctx = canvas.getContext("2d");
@@ -125,8 +125,8 @@
 
         let needCheckResize = true;
         function checkWindowResize() {
-            let w = safeArea.clientWidth;// Math.max(document.body.clientWidth, window.innerWidth);
-            let h = safeArea.clientHeight;// Math.max(document.body.clientHeight, window.innerHeight);
+            let w = safeArea.clientWidth * window.devicePixelRatio;// Math.max(document.body.clientWidth, window.innerWidth);
+            let h = safeArea.clientHeight * window.devicePixelRatio;// Math.max(document.body.clientHeight, window.innerHeight);
             if (w != width || h != height || needCheckResize) {
                 //console.log(`window.innerWidth: ${window.innerWidth}, window.innerHeight: ${window.innerHeight}, ${width} x ${height}`);
 
