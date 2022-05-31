@@ -5,8 +5,7 @@
     <meta charset="utf-8" />
     <title>Lillium PWA test</title>
 
-    <meta name="viewport" content="viewport-fit=cover, user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-
+    <meta name="viewport" content="viewport-fit=cover, user-scalable=no"> <!--width=device-width, initial-scale=1, maximum-scale=1-->
     <!-- Startup configuration -->
     <link rel="manifest" href="app.webmanifest">
 
@@ -22,33 +21,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&family=Nunito&display=swap" rel="stylesheet">
 
     <style>
-        @supports(padding:max(0px)) {
-            body, header, footer {
-                padding-left: min(0vmin, env(safe-area-inset-left));
-                padding-right: min(0vmin, env(safe-area-inset-right));
-            }
+        :root {
+            --sat: env(safe-area-inset-top);
+            --sar: env(safe-area-inset-right);
+            --sab: env(safe-area-inset-bottom);
+            --sal: env(safe-area-inset-left);
         }
+
+        #safe-area {
+            position: fixed;
+            bottom: 0px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            background-color: #111;
+        }
+
 
         body {
             font-family: 'Nunito', sans-serif;
             background-color: black;
-            width: 100%;
-            height: 100%;
             overflow: hidden;
+            margin: 0px 0px 0px 0px;
+            position: fixed;
         }
 
         canvas {
             width: 100%;
-            height: 100%;
+            aspect-ratio: 1 / 1;
             display: inline-block;
-            position: fixed;
+            /*position: fixed;*/
             top: 0px;
             left: 0px;
             z-index: -1;
             image-rendering: pixelated;
         }
 
-        #container {
+        .centered-container {
             text-align: center;
             position: fixed;
             width: 100%;
@@ -63,58 +73,73 @@
         #resolution {
             color: white;
             font-size: 2rem;
+            margin: 1em;
         }
 
         #fullscreen-button {
             position: fixed;
-            top: 0px;
+            bottom: 0px;
             right: 0px;
             background-color: white;
             color: black;
             font-size: 2rem;
-            margin: 8px;
-            padding: 8px;
+            margin: 1em;
+            padding: 1rem;
         }
     </style>
 </head>
 <body>
-    <canvas id="canvas">
-    </canvas>
-
-    <div id="container">
+    <div id="safe-area">
+        <canvas id="canvas">
+        </canvas>
         <p id="resolution">800x600</p>
-    </div>
 
-    <button id="fullscreen-button" onclick="toggleFullScreen()">
-        Fullscreen
-    </button>
+        <!--
+        <div id="centered-container">
+            <p class="centered-p">800x600</p>
+        </div>
+        -->
+
+        <button id="fullscreen-button" onclick="toggleFullScreen()">
+            Fullscreen
+        </button>
+    </div>
 
 
     <script>
         let canvas = document.getElementById("canvas");
-        let width = document.body.clientWidth;
-        let height = document.body.clientHeight;
-        canvas.width = width;
-        canvas.height = height;
+        let safeArea = document.getElementById("safe-area");
+        console.log(safeArea);
+        let width = safeArea.clientWidth;
+        let height = safeArea.clientHeight;
+        canvas.width = Math.min(width, height);
+        canvas.height = Math.min(width, height);
         let ctx = canvas.getContext("2d");
-        let resolutionDisplay = document.getElementById("resolution")
+        let resolutionDisplay = document.getElementById("resolution");
+
+        let tmpBg = new Image();
+        tmpBg.addEventListener("load", redraw);
+        tmpBg.src = "img/temp-icon.jpg";
+
+        //let sat = getComputedStyle(document.documentElement).getPropertyValue("--sat");
 
         let needCheckResize = true;
         function checkWindowResize() {
-            let w = Math.max(document.body.clientWidth, window.innerWidth);
-            let h = Math.max(document.body.clientHeight, window.innerHeight);
+            let w = safeArea.clientWidth;// Math.max(document.body.clientWidth, window.innerWidth);
+            let h = safeArea.clientHeight;// Math.max(document.body.clientHeight, window.innerHeight);
             if (w != width || h != height || needCheckResize) {
                 //console.log(`window.innerWidth: ${window.innerWidth}, window.innerHeight: ${window.innerHeight}, ${width} x ${height}`);
 
-                width = w;
-                height = h;
+                let side = Math.min(w, h);
+                width = side;
+                height = side;
                 canvas.width = width;
                 canvas.height = height;
 
-                resolutionDisplay.innerText = `${width} x ${height}`;
+                resolutionDisplay.innerText = `${side} x ${side}`;
                 needCheckResize = false;
 
-                // TODO repaint
+                
                 redraw();
             }
         }
@@ -127,11 +152,19 @@
         function redraw() {
             console.log("redrawing..");
 
-            ctx.fillStyle = "#000";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#555";
+            ctx.fillRect(0, 0, width, height);
+            if (tmpBg.complete) {
+                if (tmpBg.width < width) {
+                    ctx.drawImage(tmpBg, width / 2 - tmpBg.width / 2, height / 2 - tmpBg.height / 2, tmpBg.width, tmpBg.height);
+                }
+                else {
+                    ctx.drawImage(tmpBg, 0, 0, width, height);
+                }
+            }
 
 
-            ctx.strokeStyle = "#34a";
+            ctx.strokeStyle = "#3ca";
             let startPower = 7;
             let posFix = 0;
             for (let i = startPower; Math.pow(2, i) < width || Math.pow(2, i) < height; ++i) {
@@ -139,7 +172,7 @@
 
                 if (di < width) {
                     ctx.beginPath();
-                    ctx.lineWidth = (i - startPower) * 3;
+                    ctx.lineWidth = (i - startPower) * 4;
                     for (let x = 0; x < width; x += di) {
                         ctx.moveTo(x + posFix, 0);
                         ctx.lineTo(x + posFix, height);
@@ -148,7 +181,7 @@
                 }
                 if (di < height) {
                     ctx.beginPath();
-                    ctx.lineWidth = (i - startPower) * 3;
+                    ctx.lineWidth = (i - startPower) * 4;
                     for (let y = 0; y < height; y += di) {
                         ctx.moveTo(0, y + posFix);
                         ctx.lineTo(width, y + posFix);
