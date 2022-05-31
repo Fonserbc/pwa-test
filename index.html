@@ -30,12 +30,15 @@
 
         #safe-area {
             position: fixed;
-            margin: 0px 0px 0px 0px;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
             /*width: 100%;
             height: 100%;*/
             overflow: hidden;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            background-color: #111;
+            margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            background-color: #222;
         }
 
 
@@ -154,6 +157,19 @@
 
             ctx.fillStyle = "#555";
             ctx.fillRect(0, 0, width, height);
+
+            // border
+            ctx.fillStyle = "fff";
+            ctx.beginPath();
+            ctx.lineWidth = 12;
+            ctx.moveTo(0, 0);
+            ctx.lineTo(width, 0);
+            ctx.lineTo(width, height);
+            ctx.lineTo(0, height);
+            ctx.lineTo(0, 0);
+            ctx.stroke();
+
+            // image
             if (tmpBg.complete) {
                 if (tmpBg.width < width) {
                     ctx.drawImage(tmpBg, width / 2 - tmpBg.width / 2, height / 2 - tmpBg.height / 2, tmpBg.width, tmpBg.height);
