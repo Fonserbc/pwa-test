@@ -49,6 +49,11 @@
             margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             background-color: #222;
             height: 100%;
+
+            display: flex;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
         }
 
         @supports (padding-top: env(safe-area-inset-top)) {
@@ -73,17 +78,17 @@
 
         canvas {
             width: 100%;
+            max-width: 1024px;
             aspect-ratio: 1 / 1;
+            margin-top: 1em;
             /*display: inline-block;
-            position: fixed;
-            top: 0px;
+            margin: auto;
             left: 0px;*/
             z-index: -1;
             image-rendering: pixelated;
         }
 
         .centered-container {
-            text-align: center;
             position: fixed;
             width: 100%;
             min-height: 100%;
@@ -92,6 +97,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            text-align: center;
         }
 
         #resolution {
@@ -134,8 +140,8 @@
         let canvas = document.getElementById("canvas");
         let safeArea = document.getElementById("safe-area");
         console.log(safeArea);
-        let width = safeArea.clientWidth * window.devicePixelRatio;
-        let height = safeArea.clientHeight * window.devicePixelRatio;
+        let width = canvas.clientWidth * window.devicePixelRatio;
+        let height = canvas.clientHeight * window.devicePixelRatio;
         canvas.width = Math.min(width, height);
         canvas.height = Math.min(width, height);
         let ctx = canvas.getContext("2d");
@@ -149,9 +155,10 @@
 
         let needCheckResize = true;
         function checkWindowResize() {
-            let w = safeArea.clientWidth * window.devicePixelRatio;// Math.max(document.body.clientWidth, window.innerWidth);
-            let h = safeArea.clientHeight * window.devicePixelRatio;// Math.max(document.body.clientHeight, window.innerHeight);
-            if (w != width || h != height || needCheckResize) {
+            let w = canvas.clientWidth * window.devicePixelRatio;// Math.max(document.body.clientWidth, window.innerWidth);
+            let h = canvas.clientHeight * window.devicePixelRatio;// Math.max(document.body.clientHeight, window.innerHeight);
+            let side = Math.min(w, h);
+            if (side != width || side != height || needCheckResize) {
                 //console.log(`window.innerWidth: ${window.innerWidth}, window.innerHeight: ${window.innerHeight}, ${width} x ${height}`);
 
                 let side = Math.min(w, h);
